@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.2.146/build/pdf.min.js"></script>
+  <style>
+    #pdf-viewer {
+      width: 100%;
+      overflow-x: scroll;
+    }
+    .pdf-page {
+      width: 50%;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="pdf-viewer">
+    <div id="pdf-container"></div>
+    <button id="reset-button">Go to First Page</button>
+  </div>
+
+  <script>
+    // Global variables
+    var pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        scale = 2;
+
+    // Get the document from the URL
+    PDFJS.getDocument('https://cdn-eu.ki-wi.cz/132a0cd0029a4dd9a3513f4f06083b61/CZ_Digital_1HY23.pdf').then(function(pdf) {
+      pdfDoc = pdf;
+
+      // Initial/First rendering of pages
+      renderPage(pageNum);
+    });
+
+    // Render the page
+    function renderPage(num) {
+      pageRendering = true;
+
+      // Using promise to fetch the page
+      pdfDoc.getPage(num).then(function(page) {
+        var viewport = page.getViewport({ scale: scale });
+
+        // Create canvas for each page
+        var canvas1 = document.createElement('canvas');
+        var canvas2 = document.createElement('canvas');
+
+        canvas1.height = viewport.height;
+        canvas1.width = viewport.width;
+        canvas2.height = viewport.height;
+        canvas2.width = viewport.width;
+
+        // Render the page into the canvas
+        var renderContext = {
+          canvasContext: canvas1.getContext('2d'),
+          viewport: viewport
+        };
+        page.render(renderContext);
+
+        // Move to the next page
+        pageNum++;
+        renderPage(pageNum);
+
+        var pdfPage1 = document.createElement("div");
+        pdfPage1.classList.add("pdf-page");
+        pdfPage1.appendChild(canvas1);
+        var pdfPage2 = document.createElement("div");
+        pdfPage2.classList.add("pdf-page");
+        pdfPage2.appendChild(canvas2);
+
+        // Add the canvas to the pdf-container
+        document.getElementById("pdf-container").appendChild(pdfPage1);
+        document.getElementById("pdf-container").appendChild(pdfPage2);
+
+        pageRendering = false;
+      });
+
+    }
+
+    // Go to the first page of the PDF
+    document.getElementById("reset-button").addEventListener("click", function() {
+      document.getElementById("pdf-container").innerHTML = "";
+      pageNum = 1;
+      renderPage(pageNum);
+    });
+  </script>
+
+</body>
+</html>
