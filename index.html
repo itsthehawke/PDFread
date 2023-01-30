@@ -1,5 +1,64 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Simple PDF Reader</title>
+    <!-- Include the PDF.js library -->
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+  </head>
+  <body>
+    <!-- Create a container for the PDF viewer -->
+    <div id="pdf-container">
+      <canvas id="pdf-canvas"></canvas>
+    </div>
+    <!-- Create a button to go back to the first page -->
+    <button id="first-page-button">Go to First Page</button>
+    <!-- Add JavaScript to load and display the PDF -->
+    <script>
+      // Get references to the canvas and button
+      var pdfCanvas = document.getElementById("pdf-canvas");
+      var firstPageButton = document.getElementById("first-page-button");
+      // Load the PDF
+      PDFJS.getDocument("https://raw.githubusercontent.com/itsthehawke/PDFread/main/Office365Admin_WB02.pdf").then(function(pdf) {
+        // Get the first page
+        pdf.getPage(1).then(function(page) {
+          // Get the viewport for the first page
+          var viewport = page.getViewport({ scale: 1 });
+          // Set the canvas dimensions to match the viewport
+          pdfCanvas.width = viewport.width;
+          pdfCanvas.height = viewport.height;
+          // Render the first page into the canvas
+          var renderContext = {
+            canvasContext: pdfCanvas.getContext("2d"),
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+        // Handle the "Go to First Page" button click
+        firstPageButton.addEventListener("click", function() {
+          pdf.getPage(1).then(function(page) {
+            // Get the viewport for the first page
+            var viewport = page.getViewport({ scale: 1 });
+            // Set the canvas dimensions to match the viewport
+            pdfCanvas.width = viewport.width;
+            pdfCanvas.height = viewport.height;
+            // Render the first page into the canvas
+            var renderContext = {
+              canvasContext: pdfCanvas.getContext("2d"),
+              viewport: viewport
+            };
+            page.render(renderContext);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<!--
+
+<!DOCTYPE html>
+<html>
 <head>
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.2.146/build/pdf.min.js"></script>
   <style>
